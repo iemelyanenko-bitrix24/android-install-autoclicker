@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">InstallClicker</string>
+    <string name="service_label">InstallClicker: автоклик «Установить»</string>
+    <string name="service_description">Нажимает кнопку подтверждения установки APK в системном установщике. Нужен там, где кнопка не реагирует на касание из-за системного оверлея поверх экрана.</string>
+
+    <string name="device_info">Android %1$s (SDK %2$d) · %3$s</string>
+
+    <string name="status_service_off">Сервис доступности выключен — автоклик не работает</string>
+    <string name="status_service_starting">Сервис включён в настройках, ожидает запуска системой</string>
+    <string name="status_autoclick_off">Сервис работает, автоклик выключен</string>
+    <string name="status_ready">Сервис работает, автоклик включён</string>
+
+    <string name="switch_enabled">Автоклик кнопки «Установить»</string>
+    <string name="open_accessibility_settings">Открыть настройки доступности</string>
+
+    <string name="section_options">Параметры</string>
+    <string name="option_any_package">Работать в любом приложении, а не только в системном установщике</string>
+    <string name="option_gesture">Пробовать жест по координатам, если ACTION_CLICK не сработал</string>
+    <string name="option_verbose">Подробный лог: дампить дерево окна в logcat</string>
+
+    <string name="section_log">Лог</string>
+    <string name="log_empty">Пусто</string>
+    <string name="copy_log">Скопировать</string>
+    <string name="clear_log">Очистить</string>
+    <string name="log_copied">Лог скопирован</string>
+    <string name="settings_unavailable">Настройки доступности недоступны, включите сервис через adb</string>
+
+    <string name="adb_hint">Включение сервиса через adb:\nadb shell settings put secure enabled_accessibility_services ru.installclicker/ru.installclicker.InstallClickerService\nadb shell settings put secure accessibility_enabled 1\n\nВключить автоклик:\nadb shell am broadcast -a ru.installclicker.TOGGLE --ez enabled true\n\nВыключить автоклик:\nadb shell am broadcast -a ru.installclicker.TOGGLE --ez enabled false\n\nЛог:\nadb logcat -s InstallClicker</string>
+</resources>
