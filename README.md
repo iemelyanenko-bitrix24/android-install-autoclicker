@@ -45,7 +45,13 @@ accessibility-действие, диспетчеризуемое самой си
 Нужен JDK 17 и Android SDK (`platforms;android-34`, `build-tools;34.0.0`).
 Gradle wrapper (8.7) в репозитории есть, системный Gradle не нужен.
 
-Через Homebrew (macOS), без правки `~/.zshrc` — на один проект:
+Проще всего — открыть проект в Android Studio (Ladybug или новее, любая ОС):
+она сама поставит JDK и SDK при первой синхронизации, и `local.properties`
+создавать не придётся. Ниже — вариант через терминал, для каждой ОС отдельно.
+
+### macOS (Homebrew)
+
+Без правки `~/.zshrc` — переменные только на один проект:
 
 ```bash
 brew install openjdk@17
@@ -58,14 +64,62 @@ sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
 echo "sdk.dir=$ANDROID_HOME" > local.properties
 ```
 
-Либо открыть проект в Android Studio (Ladybug или новее) — она поставит JDK
-и SDK сама.
+### Linux (Debian/Ubuntu)
 
-Сборка:
+```bash
+sudo apt install openjdk-17-jdk-headless unzip
+```
+
+На других дистрибутивах — тот же пакет через свой менеджер
+(`sudo dnf install java-17-openjdk-devel`, `sudo pacman -S jdk17-openjdk`).
+
+Дальше — Android SDK command-line tools: скачать «Command line tools only»
+для Linux со страницы
+[developer.android.com/studio#command-tools](https://developer.android.com/studio#command-tools)
+и распаковать так, чтобы вложенная папка `cmdline-tools` лежала на один
+уровень глубже (`~/android-sdk/cmdline-tools/latest/...`, а не
+`~/android-sdk/cmdline-tools/...`) — иначе `sdkmanager` её не найдёт:
+
+```bash
+mkdir -p ~/android-sdk/cmdline-tools
+unzip -q ~/Downloads/commandlinetools-linux-*.zip -d ~/android-sdk/cmdline-tools
+mv ~/android-sdk/cmdline-tools/cmdline-tools ~/android-sdk/cmdline-tools/latest
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export ANDROID_HOME="$HOME/android-sdk"
+export PATH="$JAVA_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+yes | sdkmanager --licenses
+sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
+echo "sdk.dir=$ANDROID_HOME" > local.properties
+```
+
+### Windows (PowerShell)
+
+JDK 17 — например,
+[Microsoft Build of OpenJDK](https://learn.microsoft.com/java/openjdk/download#openjdk-17)
+(`.msi`, путь установки — он и есть `JAVA_HOME` ниже).
+
+Android SDK command-line tools — «Command line tools only» для Windows со
+страницы
+[developer.android.com/studio#command-tools](https://developer.android.com/studio#command-tools),
+распаковать так же, как на Linux: вложенная папка `cmdline-tools` должна
+лежать на один уровень глубже, `%ANDROID_HOME%\cmdline-tools\latest\...`.
+
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-17.x.x.x-hotspot"
+$env:ANDROID_HOME = "$HOME\android-sdk"
+$env:PATH = "$env:JAVA_HOME\bin;$env:ANDROID_HOME\cmdline-tools\latest\bin;$env:ANDROID_HOME\platform-tools;$env:PATH"
+sdkmanager --licenses
+sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
+"sdk.dir=$($env:ANDROID_HOME -replace '\\','/')" | Out-File -Encoding ascii local.properties
+```
+
+### Сборка и тесты (одинаково на всех ОС)
 
 ```bash
 ./gradlew assembleRelease
 ```
+
+На Windows — `gradlew.bat assembleRelease` (или тот же `./gradlew` из Git Bash).
 
 Готовый APK: `app/build/outputs/apk/release/app-release.apk`
 (release подписан debug-ключом, чтобы сразу ставился через adb).
@@ -77,13 +131,7 @@ echo "sdk.dir=$ANDROID_HOME" > local.properties
 ```
 
 17 тестов (`NodeMatcherTest` — 14, `ClickThrottleTest` — 3), проверено на
-Gradle 8.7 / JDK 17.0.20 / compileSdk 34.
-
-## Установка на ГУ
-
-```bash
-adb install -r app/build/outputs/apk/release/app-release.apk
-```
+Gradle 8.7 / JDK 17.0.20 / compileSdk 34 (macOS).
 
 ## Включение сервиса доступности
 
